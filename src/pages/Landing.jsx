@@ -51,7 +51,7 @@ export default function Landing() {
         </div>
         <p style={{ marginTop: 16, fontSize: 13 }}>
           <Link to="/documents" style={{ color: '#ffb347', textDecoration: 'underline' }}>
-            まずは無料で書類作成を試す →
+            ご契約済みの方はこちら →
           </Link>
         </p>
       </section>
