@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { load, save } from '../lib/store.js'
+import { getSession, logout } from '../lib/auth.js'
 
 export default function Settings() {
   const [c, setC] = useState(() => load('company', {
@@ -28,9 +29,13 @@ export default function Settings() {
         {saved && <span className="badge ok" style={{ marginLeft: 10 }}>保存しました</span>}
       </div>
       <div className="card">
-        <h2>ご契約</h2>
-        <p className="muted">プラン：月額 ¥1,200（税込）<br />
-          解約・お支払い方法の変更は、決済時にStripeから届いたメール内のリンクから行えます。</p>
+        <h2>ご契約・アカウント</h2>
+        <p className="muted">ログイン中：{getSession()?.email || '—'}<br />
+          プラン：月額 ¥1,200（税込）<br />
+          解約・お支払い方法の変更は、決済時にStripeから届いたメール内のリンクから行えます。<br />
+          ※ お支払いが確認できない場合、その月からご利用を停止いたします。</p>
+        <button className="btn btn-ghost btn-sm" style={{ marginTop: 8 }}
+          onClick={() => { logout(); window.location.href = '/' }}>ログアウト</button>
       </div>
     </div>
   )

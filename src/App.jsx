@@ -1,7 +1,7 @@
 import { Routes, Route, NavLink, useLocation } from 'react-router-dom'
 import { useState } from 'react'
-import { isActive } from './lib/license.js'
-import License from './pages/License.jsx'
+import { isLoggedIn } from './lib/auth.js'
+import Login from './pages/Login.jsx'
 import Landing from './pages/Landing.jsx'
 import Documents from './pages/Documents.jsx'
 import DocEditor from './pages/DocEditor.jsx'
@@ -14,12 +14,12 @@ import Success from './pages/Success.jsx'
 export default function App() {
   const { pathname } = useLocation()
   const isLanding = pathname === '/'
-  const [unlocked, setUnlocked] = useState(() => isActive())
+  const [unlocked, setUnlocked] = useState(() => isLoggedIn())
 
-  // 契約有効な人だけアプリ本体を使える（未払い・解約はその時点で停止）
+  // ログイン済み＆契約有効な人だけアプリ本体を使える（未払い・解約はその時点で停止）
   const isPublic = isLanding || pathname === '/success'
   if (!isPublic && !unlocked) {
-    return <License onUnlock={() => setUnlocked(true)} />
+    return <Login onUnlock={() => setUnlocked(true)} />
   }
 
   return (
