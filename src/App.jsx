@@ -1,7 +1,6 @@
 import { Routes, Route, NavLink, useLocation } from 'react-router-dom'
-import { useState } from 'react'
-import { isLoggedIn, isTrialExpired, isTrial, getSession } from './lib/auth.js'
-import Login from './pages/Login.jsx'
+import { useState, useEffect } from 'react'
+import { isLoggedIn, isTrialExpired, isTrial, trialRemainingMs, ensureTrial } from './lib/auth.js'
 import TrialExpired from './pages/TrialExpired.jsx'
 import Landing from './pages/Landing.jsx'
 import Documents from './pages/Documents.jsx'
@@ -13,15 +12,16 @@ import Settings from './pages/Settings.jsx'
 import Success from './pages/Success.jsx'
 
 function TrialBanner() {
-  const s = getSession()
-  if (!isTrial() || !s?.trialEnd) return null
-  const hours = Math.ceil((s.trialEnd - Date.now()) / 3600000)
+  const ms = trialRemainingMs()
+  if (!isTrial() || ms === 0) return null
+  const hours = Math.ceil(ms / 3600000)
   const label = hours > 24 ? `残り${Math.ceil(hours / 24)}日` : `残り約${hours}時間`
   return (
     <div style={{ background: '#fff7ed', borderBottom: '1px solid #fed7aa', padding: '6px 16px', fontSize: 13, textAlign: 'center' }}>
       <span style={{ color: '#c2410c', fontWeight: 700 }}>無料トライアル中（{label}）</span>
       <span style={{ color: '#7c3aed', marginLeft: 12 }}>
-        終了後は月額¥1,200 — <a href="/success" style={{ textDecoration: 'underline', color: '#7c3aed' }}>今すぐ登録する</a>
+        終了後は月額¥1,200 —{' '}
+        <a href="/success" style={{ textDecoration: 'underline', color: '#7c3aed' }}>今すぐ登録する</a>
       </span>
     </div>
   )
@@ -31,11 +31,22 @@ export default function App() {
   const { pathname } = useLocation()
   const isLanding = pathname === '/'
   const isPublic = isLanding || pathname === '/success'
-  const [unlocked, setUnlocked] = useState(() => isLoggedIn())
+
+  // アプリページに初めて来たらトライアル自動開始（メール不要）
+  useEffect(() => {
+    if (!isPublic) ensureTrial()
+  }, [isPublic])
+
+  const [, forceUpdate] = useState(0)
+  const rerender = () => forceUpdate(n => n + 1)
 
   if (!isPublic) {
-    if (isTrialExpired()) return <TrialExpired onUnlock={() => setUnlocked(true)} />
-    if (!unlocked) return <Login onUnlock={() => setUnlocked(true)} />
+    if (isTrialExpired()) return <TrialExpired onUnlock={rerender} />
+    if (!isLoggedIn()) {
+      // ensureTrial が走った直後は再レンダリングが必要なので即return しない
+      ensureTrial()
+      if (!isLoggedIn()) return null // 一瞬だけ空白→次フレームで再評価
+    }
   }
 
   return (

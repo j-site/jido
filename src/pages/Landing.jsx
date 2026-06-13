@@ -1,6 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
-import { startTrial } from '../lib/auth.js'
+import { useNavigate } from 'react-router-dom'
 
 const FEATURES = [
   { icon: '📄', name: '見積書', desc: '明細を入れるだけで自動計算。そのままPDF保存' },
@@ -13,61 +11,32 @@ const FEATURES = [
 ]
 
 export default function Landing() {
-  const [loading, setLoading] = useState(false)
-  const [email, setEmail] = useState('')
-  const [msg, setMsg] = useState('')
   const navigate = useNavigate()
-
-  const tryFree = async () => {
-    if (!email.trim()) { setMsg('メールアドレスを入力してください'); return }
-    setLoading(true); setMsg('')
-    try {
-      await startTrial(email.trim())
-      navigate('/documents')
-    } catch (e) {
-      if (e.message === 'SUBSCRIBED') {
-        setMsg('このメールアドレスはすでにご契約中です。')
-        setTimeout(() => navigate('/documents'), 1500)
-      } else if (e.message === 'EXPIRED') {
-        setMsg('トライアル期間が終了しています。下のログインからカード登録してご利用ください。')
-      } else {
-        setMsg(e.message)
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
 
   return (
     <>
       <section className="hero">
         <img src="/logo.svg" alt="Jido" />
         <h1>建設業の事務を、<em>自動</em>に。</h1>
-        <p>見積書・請求書・領収書・案内状・日報・写真管理・AIチャット。
+        <p>見積書・請求書・領収書・案内状・日報・写真管理・AIチャット。<br />
           現場仕事のあとの「もうひと仕事」を、Jidoがぜんぶ引き受けます。スマホひとつでOK。</p>
 
-        <div style={{ margin: '12px 0 4px' }}>
-          <span style={{ background: '#ff8c00', color: '#fff', fontWeight: 700, fontSize: 14, padding: '4px 16px', borderRadius: 999 }}>
-            3日間 無料・カード不要
+        <div style={{ margin: '12px 0 6px' }}>
+          <span style={{ background: '#ff8c00', color: '#fff', fontWeight: 700, fontSize: 14, padding: '4px 18px', borderRadius: 999 }}>
+            3日間 無料・登録不要
           </span>
         </div>
-        <div className="price-tag" style={{ marginTop: 6 }}>その後 月額 ¥1,200<small>（税込）/ いつでも解約OK</small></div>
-
-        <div style={{ maxWidth: 420, margin: '16px auto 0', display: 'flex', gap: 8 }}>
-          <input type="email" placeholder="メールアドレス" value={email}
-            onChange={e => { setEmail(e.target.value); setMsg('') }} style={{ flex: 1 }}
-            onKeyDown={e => e.key === 'Enter' && tryFree()} />
-          <button className="btn btn-primary" onClick={tryFree} disabled={loading}>
-            {loading ? '処理中…' : '無料で試す'}
-          </button>
+        <div className="price-tag" style={{ marginTop: 6 }}>
+          その後 月額 ¥1,200<small>（税込）/ いつでも解約OK</small>
         </div>
-        {msg && <p style={{ color: '#ffd0a0', fontSize: 13, marginTop: 8 }}>{msg}</p>}
 
-        <p style={{ marginTop: 14, fontSize: 13 }}>
-          <Link to="/documents" style={{ color: '#ffb347', textDecoration: 'underline' }}>
-            ご契約済み・トライアル中の方はこちら →
-          </Link>
-        </p>
+        <button
+          className="btn btn-primary"
+          style={{ marginTop: 20, fontSize: 17, padding: '14px 40px', borderRadius: 12 }}
+          onClick={() => navigate('/documents')}
+        >
+          今すぐ無料で使う
+        </button>
       </section>
 
       <div className="container">

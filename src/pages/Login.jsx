@@ -63,7 +63,7 @@ export default function Login({ onUnlock }) {
         )}
       </p>
       <p className="muted" style={{ textAlign: 'center', marginTop: 12 }}>
-        まだご契約でない方は <Link to="/" style={{ textDecoration: 'underline' }}>こちらからご登録</Link>（月額¥1,200）
+        <Link to="/" style={{ textDecoration: 'underline' }}>トップページへ戻る</Link>
       </p>
     </div>
   )
