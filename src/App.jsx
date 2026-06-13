@@ -1,7 +1,8 @@
 import { Routes, Route, NavLink, useLocation } from 'react-router-dom'
 import { useState } from 'react'
-import { isLoggedIn } from './lib/auth.js'
+import { isLoggedIn, isTrialExpired, isTrial, getSession } from './lib/auth.js'
 import Login from './pages/Login.jsx'
+import TrialExpired from './pages/TrialExpired.jsx'
 import Landing from './pages/Landing.jsx'
 import Documents from './pages/Documents.jsx'
 import DocEditor from './pages/DocEditor.jsx'
@@ -11,15 +12,30 @@ import Chat from './pages/Chat.jsx'
 import Settings from './pages/Settings.jsx'
 import Success from './pages/Success.jsx'
 
+function TrialBanner() {
+  const s = getSession()
+  if (!isTrial() || !s?.trialEnd) return null
+  const hours = Math.ceil((s.trialEnd - Date.now()) / 3600000)
+  const label = hours > 24 ? `残り${Math.ceil(hours / 24)}日` : `残り約${hours}時間`
+  return (
+    <div style={{ background: '#fff7ed', borderBottom: '1px solid #fed7aa', padding: '6px 16px', fontSize: 13, textAlign: 'center' }}>
+      <span style={{ color: '#c2410c', fontWeight: 700 }}>無料トライアル中（{label}）</span>
+      <span style={{ color: '#7c3aed', marginLeft: 12 }}>
+        終了後は月額¥1,200 — <a href="/success" style={{ textDecoration: 'underline', color: '#7c3aed' }}>今すぐ登録する</a>
+      </span>
+    </div>
+  )
+}
+
 export default function App() {
   const { pathname } = useLocation()
   const isLanding = pathname === '/'
+  const isPublic = isLanding || pathname === '/success'
   const [unlocked, setUnlocked] = useState(() => isLoggedIn())
 
-  // ログイン済み＆契約有効な人だけアプリ本体を使える（未払い・解約はその時点で停止）
-  const isPublic = isLanding || pathname === '/success'
-  if (!isPublic && !unlocked) {
-    return <Login onUnlock={() => setUnlocked(true)} />
+  if (!isPublic) {
+    if (isTrialExpired()) return <TrialExpired onUnlock={() => setUnlocked(true)} />
+    if (!unlocked) return <Login onUnlock={() => setUnlocked(true)} />
   }
 
   return (
@@ -39,6 +55,7 @@ export default function App() {
           </nav>
         </header>
       )}
+      {!isLanding && <TrialBanner />}
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/documents" element={<Documents />} />

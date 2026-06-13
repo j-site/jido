@@ -13,7 +13,7 @@ export default async function handler(req, res) {
   try {
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
-      customer_email: email || undefined,
+      customer_email: email ? email.trim().toLowerCase() : undefined,
       line_items: [{
         price_data: {
           currency: 'jpy',
@@ -26,10 +26,8 @@ export default async function handler(req, res) {
         },
         quantity: 1,
       }],
-      subscription_data: {
-        trial_period_days: 7,
-        trial_settings: { end_behavior: { missing_payment_method: 'cancel' } },
-      },
+      // トライアルはメール登録3日間で済んでいるため、カード登録後は即課金
+
       success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/`,
     })
