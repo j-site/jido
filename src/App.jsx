@@ -32,21 +32,15 @@ export default function App() {
   const isLanding = pathname === '/'
   const isPublic = isLanding || pathname === '/success'
 
-  // アプリページに初めて来たらトライアル自動開始（メール不要）
-  useEffect(() => {
-    if (!isPublic) ensureTrial()
-  }, [isPublic])
+  // アプリページに来たら即トライアル開始（レンダリング前に同期実行）
+  if (!isPublic) ensureTrial()
 
   const [, forceUpdate] = useState(0)
   const rerender = () => forceUpdate(n => n + 1)
 
   if (!isPublic) {
     if (isTrialExpired()) return <TrialExpired onUnlock={rerender} />
-    if (!isLoggedIn()) {
-      // ensureTrial が走った直後は再レンダリングが必要なので即return しない
-      ensureTrial()
-      if (!isLoggedIn()) return null // 一瞬だけ空白→次フレームで再評価
-    }
+    if (!isLoggedIn()) return null
   }
 
   return (
