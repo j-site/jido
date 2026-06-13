@@ -41,12 +41,20 @@ export default function Landing() {
         <h1>建設業の事務を、<em>自動</em>に。</h1>
         <p>見積書・請求書・領収書・案内状・日報・写真管理・AIチャット。
           現場仕事のあとの「もうひと仕事」を、Jidoがぜんぶ引き受けます。スマホひとつでOK。</p>
-        <div className="price-tag">月額 ¥1,200<small>（税込）/ いつでも解約OK</small></div>
-        <div style={{ maxWidth: 420, margin: '20px auto 0', display: 'flex', gap: 8 }}>
+        <div style={{ margin: '12px 0 4px' }}>
+          <span style={{ background: '#ff8c00', color: '#fff', fontWeight: 700, fontSize: 14, padding: '4px 16px', borderRadius: 999 }}>
+            7日間 無料トライアル
+          </span>
+        </div>
+        <div className="price-tag">その後 月額 ¥1,200<small>（税込）/ いつでも解約OK</small></div>
+        <p style={{ color: '#b9c8da', fontSize: 13, margin: '4px 0 16px' }}>
+          クレジットカードを登録するだけ。7日以内に解約すれば一切請求されません。
+        </p>
+        <div style={{ maxWidth: 420, margin: '0 auto', display: 'flex', gap: 8 }}>
           <input type="email" placeholder="メールアドレス" value={email}
             onChange={e => setEmail(e.target.value)} style={{ flex: 1 }} />
           <button className="btn btn-primary" onClick={subscribe} disabled={loading}>
-            {loading ? '処理中…' : '今すぐ始める'}
+            {loading ? '処理中…' : '無料で試す'}
           </button>
         </div>
         <p style={{ marginTop: 16, fontSize: 13 }}>

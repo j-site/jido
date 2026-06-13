@@ -26,6 +26,10 @@ export default async function handler(req, res) {
         },
         quantity: 1,
       }],
+      subscription_data: {
+        trial_period_days: 7,
+        trial_settings: { end_behavior: { missing_payment_method: 'cancel' } },
+      },
       success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/`,
     })
